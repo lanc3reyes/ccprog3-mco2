@@ -14,7 +14,7 @@ public class Driver {
         Hotel defaultHotel = new Hotel("Default Hotel");
         printRoomList(defaultHotel);
 
-        // // Create a Hotel instance with a custom number of rooms (e.g., 25 rooms)
+        // // Create a Hotel instance with a custom number of rooms with 25 rooms
         // Hotel customHotel = new Hotel("Custom Hotel", 25);
         // printRoomList(customHotel);
 
