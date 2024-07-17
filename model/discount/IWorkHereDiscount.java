@@ -4,10 +4,7 @@ import model.Reservation;
 
 public class IWorkHereDiscount extends Discount {
     @Override
-    public double applyDiscount(double price, Reservation reservation) {
-        if (reservation.getDiscount().equals("I_WORK_HERE")) {
-            return price * 0.9;
-        }
-        return price;
+    public double applyDiscount(double bill, Reservation reservation) {
+        return bill * 0.9; // 10% discount
     }
 }

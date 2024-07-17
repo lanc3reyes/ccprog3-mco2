@@ -4,18 +4,12 @@ import model.Reservation;
 
 public class Stay4Get1Discount extends Discount {
     @Override
-    public double applyDiscount(double price, Reservation reservation) {
-        if (reservation.getDiscount().equals("STAY4_GET1")) {
-            int checkInDateDay = reservation.getCheckInDate().getDay();
-            int checkOutDateDay = reservation.getCheckOutDate().getDay();
-
-            if (checkOutDateDay - checkInDateDay >= 5) {
-                return price - reservation.getRoom().calculatePrice(reservation.getCheckInDate());
-            }
-
-            return price;
+    public double applyDiscount(double bill, Reservation reservation) {
+        int days = reservation.getCheckOutDate().getDay() - reservation.getCheckInDate().getDay() + 1;
+        if (days >= 5) {
+            double dailyRate = bill / days;
+            return bill - dailyRate; // First day free
         }
-
-        return price;
+        return bill;
     }
 }
