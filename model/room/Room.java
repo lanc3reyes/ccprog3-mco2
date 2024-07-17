@@ -4,30 +4,33 @@ import java.util.ArrayList;
 import model.Reservation;
 import model.Date;
 
-// TODO - Update javadoc
 public abstract class Room {
     private int name;
     private double baseRate;
+    private double priceModifier;
+    private int floorNumber;
     private ArrayList<Reservation> reservationList;
 
     /**
      * Constructor for the Room class.
      * 
      * @param name - name of the room
-     * @param baseRate - base price of a room
+     * @param floorNumber - floor number of the room
      */
-    public Room(int name, double baseRate) {
+    public Room(int name, int floorNumber) {
         this.name = name;
-        this.baseRate = baseRate;
+        this.baseRate = 1299.0; // 1299 by default
+        this.priceModifier = 1.0;
+        this.floorNumber = floorNumber;
         this.reservationList = new ArrayList<>();
     }
 
     /**
-     * Gets the name of the room.
+     * Gets the name of the room.   
      * 
      * @return name of the room
      */
-    public int getName() {
+    public int getRoomName() {
         return name;
     }
 
@@ -41,6 +44,25 @@ public abstract class Room {
     }
 
     /**
+     * Gets the price modifier of the room.
+     * 
+     * @return price modifier of the room
+     */
+    public double getPriceModifier() {
+        return priceModifier;
+    }
+
+    /**
+     * Gets the floor number of the room.
+     * 
+     * @return floor number of the room
+     */
+    public int getFloorNumber() {
+        return floorNumber;
+    }
+
+
+    /**
      * Gets the list of reservations for the room.
      * 
      * @return list of reservations
@@ -49,7 +71,7 @@ public abstract class Room {
         return reservationList;
     }
 
-    /**
+    /** 
      * Sets the name of the room.
      * 
      * @param name - new name of the room
@@ -59,18 +81,27 @@ public abstract class Room {
     }
 
     /**
-     * Sets the price of the room.
+     * Sets the base rate of the room.
      * 
      * @param baseRate - new base rate of the room
      */
-    public void setPrice(double baseRate) {
+    public void setBaseRate(double baseRate) {
         this.baseRate = baseRate;
+    }
+
+    /**
+     * Sets the price modifier of the room.
+     * 
+     * @param priceModifier - new price modifier of the room
+     */
+    public void setPriceModifier(double priceModifier) {
+        this.priceModifier = priceModifier;
     }
 
     /**
      * Adds a reservation to the room's list of reservations.
      * 
-     * @param reservation reservation to be added
+     * @param reservation - reservation to be added
      */
     public void addReservation(Reservation reservation) {
         reservationList.add(reservation);
@@ -79,7 +110,7 @@ public abstract class Room {
     /**
      * Removes a reservation from the room's list of reservations.
      * 
-     * @param reservation reservation to be removed
+     * @param reservation - reservation to be removed
      */
     public void removeReservation(Reservation reservation) {
         reservationList.remove(reservation);
@@ -88,17 +119,31 @@ public abstract class Room {
     /**
      * Checks if the room is available on a given date.
      * 
-     * @param date The date to check availability
+     * @param date - date to check availability
      * @return true if the room is available, otherwise it's false
      */
-    public boolean isAvailable(Date date) {
+    public boolean isRoomAvailable(Date date) {
         for (Reservation reservation : reservationList) {
-            if (reservation.isRoomAvailable(date) == false) {
+            Date checkInDate = reservation.getCheckInDate();
+            Date checkOutDate = reservation.getCheckOutDate();
+    
+            if (!date.isBefore(checkInDate) && !date.isAfter(checkOutDate)) {
                 return false;
             }
         }
         return true;
     }
+    
 
-    public abstract double calculatePrice(Date date);
+    /**
+     * Abstract method to calculate the price of the room for a given reservation.
+     * 
+     */
+    public abstract double calculatePrice();
+
+    /**
+     * Abstract method to get the room type.
+     * 
+     */
+    public abstract String getRoomType();
 }

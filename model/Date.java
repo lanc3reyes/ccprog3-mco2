@@ -8,7 +8,6 @@ public class Date {
     private int day;
     private int month;
     private int year;
-    private double priceModifier;
 
     /**
      * Default constructor for the Date class. Initializes the date to December 1, 2023.
@@ -17,19 +16,17 @@ public class Date {
         this.month = 12;
         this.day = 1;
         this.year = 2023;
-        this.priceModifier = 1.0;
     }
 
     /**
      * Constructor for the Date class with a specified day. Initializes the date to December of the specified day in 2023.
      * 
-     * @param day day of the month
+     * @param day - day of the month
      */
     public Date(int day) {
         this.month = 12;
-        setDay(day);
+        this.day = day;
         this.year = 2023;
-        this.priceModifier = 1.0;
     }
 
     /**
@@ -57,24 +54,6 @@ public class Date {
      */
     public int getYear() {
         return year;
-    }
-
-    /**
-     * Gets the price modifier.
-     * 
-     * @return price modifier
-     */
-    public double getPriceModifier() {
-        return priceModifier;
-    }
-
-    /**
-     * Sets the price modifier
-     * 
-     * @param priceModifier price modifier
-     */
-    public void setPriceModifier(double priceModifier) {
-        this.priceModifier = priceModifier;
     }
 
     /**

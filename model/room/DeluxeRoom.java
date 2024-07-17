@@ -1,14 +1,18 @@
 package model.room;
 
-import model.Date;
-
 public class DeluxeRoom extends Room {
-    public DeluxeRoom(int name, double baseRate) {
-        super(name, baseRate);
+    public DeluxeRoom(int name, int floorNumber) {
+        super(name, floorNumber);
+        setPriceModifier(1.2);
     }
 
     @Override
-    public double calculatePrice(Date date) {
-        return getBaseRate() * 1.2 * date.getPriceModifier();
+    public double calculatePrice() {
+        return getBaseRate() * getPriceModifier();
+    }
+
+    @Override
+    public String getRoomType() {
+        return "Deluxe";
     }
 }

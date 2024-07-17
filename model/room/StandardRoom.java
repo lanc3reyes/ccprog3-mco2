@@ -1,14 +1,17 @@
 package model.room;
 
-import model.Date;
-
 public class StandardRoom extends Room {
-    public StandardRoom(int name, double baseRate) {
-        super(name, baseRate);
+    public StandardRoom(int name, int floorNumber) {
+        super(name, floorNumber);
     }
 
     @Override
-    public double calculatePrice(Date date) {
-        return getBaseRate() * date.getPriceModifier();
+    public double calculatePrice() {
+        return getBaseRate() * getPriceModifier();
+    }
+
+    @Override
+    public String getRoomType() {
+        return "Standard";
     }
 }

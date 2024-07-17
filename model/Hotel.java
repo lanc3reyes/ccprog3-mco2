@@ -2,6 +2,9 @@ package model;
 
 import java.util.ArrayList;
 import model.room.Room;
+import model.room.StandardRoom;
+import model.room.DeluxeRoom;
+import model.room.ExecutiveRoom;
 
 /**
  * The Hotel class represents a hotel with a list of rooms and reservations.
@@ -11,7 +14,6 @@ public class Hotel {
     private String name;
     private ArrayList<Room> roomList;
     private ArrayList<Reservation> reservationList;
-    private double baseRate;
 
     /**
      * Constructor for the Hotel class.
@@ -19,11 +21,118 @@ public class Hotel {
      * @param name - name of the hotel
      */
     public Hotel(String name) {
+        this.name = name;   
+        this.roomList = new ArrayList<Room>();
+        this.reservationList = new ArrayList<Reservation>();
+        initializeDefaultRooms();
+    }
+
+    /**
+     * Constructor for the Hotel class with specified number of rooms
+     */
+    public Hotel(String name, int numberOfRooms) {
         this.name = name;
         this.roomList = new ArrayList<Room>();
         this.reservationList = new ArrayList<Reservation>();
-        this.baseRate = 1299.0;
+        initializeCustomRooms(numberOfRooms);
     }
+
+    /**
+     * Initialize default rooms (30 Standard, 10 Deluxe, 10 Executive)
+     */
+    private void initializeDefaultRooms() {
+        int roomNumber;
+        for (int floor = 1; floor <= 5; floor++) {
+            roomNumber = floor * 100 + 1; // Start room numbers from 101, 201, 301, 401, 501
+            if (floor <= 3) { // floors 1-3 Standard Rooms
+                for (int i = 0; i < 10; i++, roomNumber++) {
+                    roomList.add(new StandardRoom(roomNumber, floor));
+                }
+            } else if (floor == 4) { // floor 4 Deluxe Rooms
+                for (int i = 0; i < 10; i++, roomNumber++) {
+                    roomList.add(new DeluxeRoom(roomNumber, floor));
+                }
+            } else if (floor == 5) { // floor 5 Executive Rooms
+                for (int i = 0; i < 10; i++, roomNumber++) {
+                    roomList.add(new ExecutiveRoom(roomNumber, floor));
+                }
+            }
+        }
+    }
+
+    /**
+     *  To do as there's a mistake here (You know it :D).
+     *  Output of Custom Room
+        Room List for Custom Hotel Configuration (25 rooms):
+        Room Number: 101, Floor Number: 1, Room Type: Standard
+        Room Number: 102, Floor Number: 1, Room Type: Standard
+        Room Number: 103, Floor Number: 1, Room Type: Standard
+        Room Number: 104, Floor Number: 1, Room Type: Standard
+        Room Number: 105, Floor Number: 1, Room Type: Standard
+        Room Number: 106, Floor Number: 1, Room Type: Standard
+        Room Number: 107, Floor Number: 1, Room Type: Standard
+        Room Number: 108, Floor Number: 1, Room Type: Standard
+        Room Number: 109, Floor Number: 1, Room Type: Standard
+        Room Number: 110, Floor Number: 1, Room Type: Standard
+        Room Number: 201, Floor Number: 2, Room Type: Standard
+        Room Number: 202, Floor Number: 2, Room Type: Standard
+        Room Number: 203, Floor Number: 2, Room Type: Standard
+        Room Number: 204, Floor Number: 2, Room Type: Standard
+        Room Number: 205, Floor Number: 2, Room Type: Standard
+        Room Number: 401, Floor Number: 4, Room Type: Deluxe
+        Room Number: 402, Floor Number: 4, Room Type: Deluxe
+        Room Number: 403, Floor Number: 4, Room Type: Deluxe
+        Room Number: 404, Floor Number: 4, Room Type: Deluxe
+        Room Number: 405, Floor Number: 4, Room Type: Deluxe
+        Room Number: 501, Floor Number: 5, Room Type: Executive
+        Room Number: 502, Floor Number: 5, Room Type: Executive
+        Room Number: 503, Floor Number: 5, Room Type: Executive
+        Room Number: 504, Floor Number: 5, Room Type: Executive
+        Room Number: 505, Floor Number: 5, Room Type: Executive
+     *
+     */
+
+    /**
+     * Initialize custom rooms based on specified number
+     */
+    private void initializeCustomRooms(int numberOfRooms) {
+        int standardRooms = (int) (numberOfRooms * 0.6);
+        int deluxeRooms = (int) (numberOfRooms * 0.2);
+        int executiveRooms = numberOfRooms - standardRooms - deluxeRooms;
+    
+        int roomNumber;
+    
+        // Allocate Standard rooms on floors 1-3
+        for (int floor = 1; floor <= 3 && standardRooms > 0; floor++) {
+            roomNumber = floor * 100 + 1;
+            int roomsOnThisFloor = Math.min(10, standardRooms);
+            for (int i = 0; i < roomsOnThisFloor; i++, roomNumber++, standardRooms--) {
+                roomList.add(new StandardRoom(roomNumber, floor));
+            }
+        }
+    
+        // Allocate Deluxe rooms on floor 4
+        if (deluxeRooms > 0) {
+            int floor = 4;
+            roomNumber = floor * 100 + 1;
+            int roomsOnThisFloor = Math.min(10, deluxeRooms);
+            for (int i = 0; i < roomsOnThisFloor; i++, roomNumber++, deluxeRooms--) {
+                roomList.add(new DeluxeRoom(roomNumber, floor));
+            }
+        }
+    
+        // Allocate Executive rooms on floor 5
+        if (executiveRooms > 0) {
+            int floor = 5;
+            roomNumber = floor * 100 + 1;
+            int roomsOnThisFloor = Math.min(10, executiveRooms);
+            for (int i = 0; i < roomsOnThisFloor; i++, roomNumber++, executiveRooms--) {
+                roomList.add(new ExecutiveRoom(roomNumber, floor));
+            }
+        }
+    }
+    
+    
 
     /**
      * Gets the name of the hotel.
@@ -53,15 +162,6 @@ public class Hotel {
     }
 
     /**
-     * Gets the base rate of the rooms in the hotel.
-     * 
-     * @return base rate of the rooms
-     */
-    public double getBaseRate() {
-        return baseRate;
-    }
-
-    /**
      * Sets the name of the hotel
      * 
      * @param name - new name of the hotel
@@ -71,29 +171,19 @@ public class Hotel {
     }
 
     /**
-     * Sets the base price for the rooms in the hotel.
-     * 
-     * @param baseRate - new base rate of every rooms in the hotel
-     */
-    public void setBasePrice(double baseRate) {
-        this.baseRate = baseRate;
-    }
-
-    /**
      * Adds a room to the hotel's list of rooms.
      * 
      * @param room - room to be added in the hotel
      */
     public void addRoom(Room room) {
         if (roomList.size() >= 50) {
-        return;
+            return;
         }
         for (Room otherRoom : roomList) {
-            if (otherRoom.getName() == room.getName()) {
+            if (otherRoom.getRoomName() == room.getRoomName()) {
                 return;
             }
         }
-        room.setPrice(this.baseRate);
         roomList.add(room);
     }
 
@@ -135,7 +225,7 @@ public class Hotel {
     public ArrayList<Room> getAvailableRooms(Date date) {
         ArrayList<Room> availableRooms = new ArrayList<Room>();
         for (Room room : roomList) {
-            if (room.isAvailable(date)) {
+            if (room.isRoomAvailable(date)) {
                 availableRooms.add(room);
             }
         }
@@ -150,7 +240,7 @@ public class Hotel {
     public double calculateEarnings() {
         double totalEarnings = 0;
         for (Reservation reservation : reservationList) {
-            totalEarnings += reservation.getTotalBill();
+            totalEarnings += reservation.getBill();
         }
         return totalEarnings;
     }
@@ -163,7 +253,7 @@ public class Hotel {
      */
     public Room getRoomDetails(int roomName) {
         for (Room room : roomList) {
-            if (room.getName() == roomName) {
+            if (room.getRoomName() == roomName) {
                 return room;
             }
         }
