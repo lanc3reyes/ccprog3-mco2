@@ -1,15 +1,21 @@
 package model.room;
 
 import java.util.ArrayList;
-import model.Reservation;
-import model.Date;
+import java.util.HashMap;
 
+import model.Date;
+import model.Reservation;
+
+/**
+ * An abstract class representing a room in a hotel.
+ */
 public abstract class Room {
     private int name;
     private double baseRate;
-    private double priceModifier;
+    private double roomPriceModifier; // Percent depends on the type of room
     private int floorNumber;
     private ArrayList<Reservation> reservationList;
+    private HashMap<Integer, Double> datePriceModifiers;
 
     /**
      * Constructor for the Room class.
@@ -20,7 +26,8 @@ public abstract class Room {
     public Room(int name, int floorNumber) {
         this.name = name;
         this.baseRate = 1299.0; // 1299 by default
-        this.priceModifier = 1.0;
+        this.roomPriceModifier = 1.0;
+        this.datePriceModifiers = new HashMap<>();
         this.floorNumber = floorNumber;
         this.reservationList = new ArrayList<>();
     }
@@ -48,8 +55,18 @@ public abstract class Room {
      * 
      * @return price modifier of the room
      */
-    public double getPriceModifier() {
-        return priceModifier;
+    public double getRoomPriceModifier() {
+        return roomPriceModifier;
+    }
+
+    /**
+     * Gets the price for a specific day of a room
+     * 
+     * @param day - specific day
+     * @return price of the room for a specific day
+     */
+    public double getPriceForDay(int day) {
+        return baseRate * datePriceModifiers.getOrDefault(day, 1.0);
     }
 
     /**
@@ -60,7 +77,6 @@ public abstract class Room {
     public int getFloorNumber() {
         return floorNumber;
     }
-
 
     /**
      * Gets the list of reservations for the room.
@@ -94,8 +110,18 @@ public abstract class Room {
      * 
      * @param priceModifier - new price modifier of the room
      */
-    public void setPriceModifier(double priceModifier) {
-        this.priceModifier = priceModifier;
+    public void setRoomPriceModifier(double roomPriceModifier) {
+        this.roomPriceModifier = roomPriceModifier;
+    }
+
+    /**
+     * Gets the price for a specific day of a room
+     * 
+     * @param day - specific day
+     * @param modifider - percentage value of the modifier
+     */
+    public void setDatePriceModifier(int day, double modifier) {
+        datePriceModifiers.put(day, modifier);
     }
 
     /**
@@ -133,13 +159,6 @@ public abstract class Room {
         }
         return true;
     }
-    
-
-    /**
-     * Abstract method to calculate the price of the room for a given reservation.
-     * 
-     */
-    public abstract double calculatePrice();
 
     /**
      * Abstract method to get the room type.

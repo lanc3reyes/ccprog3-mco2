@@ -61,78 +61,43 @@ public class Hotel {
     }
 
     /**
-     *  To do as there's a mistake here (You know it :D).
-     *  Output of Custom Room
-        Room List for Custom Hotel Configuration (25 rooms):
-        Room Number: 101, Floor Number: 1, Room Type: Standard
-        Room Number: 102, Floor Number: 1, Room Type: Standard
-        Room Number: 103, Floor Number: 1, Room Type: Standard
-        Room Number: 104, Floor Number: 1, Room Type: Standard
-        Room Number: 105, Floor Number: 1, Room Type: Standard
-        Room Number: 106, Floor Number: 1, Room Type: Standard
-        Room Number: 107, Floor Number: 1, Room Type: Standard
-        Room Number: 108, Floor Number: 1, Room Type: Standard
-        Room Number: 109, Floor Number: 1, Room Type: Standard
-        Room Number: 110, Floor Number: 1, Room Type: Standard
-        Room Number: 201, Floor Number: 2, Room Type: Standard
-        Room Number: 202, Floor Number: 2, Room Type: Standard
-        Room Number: 203, Floor Number: 2, Room Type: Standard
-        Room Number: 204, Floor Number: 2, Room Type: Standard
-        Room Number: 205, Floor Number: 2, Room Type: Standard
-        Room Number: 401, Floor Number: 4, Room Type: Deluxe
-        Room Number: 402, Floor Number: 4, Room Type: Deluxe
-        Room Number: 403, Floor Number: 4, Room Type: Deluxe
-        Room Number: 404, Floor Number: 4, Room Type: Deluxe
-        Room Number: 405, Floor Number: 4, Room Type: Deluxe
-        Room Number: 501, Floor Number: 5, Room Type: Executive
-        Room Number: 502, Floor Number: 5, Room Type: Executive
-        Room Number: 503, Floor Number: 5, Room Type: Executive
-        Room Number: 504, Floor Number: 5, Room Type: Executive
-        Room Number: 505, Floor Number: 5, Room Type: Executive
-     *
-     */
-
-    /**
      * Initialize custom rooms based on specified number
+     * 
+     * @param numberOfRooms - total number of rooms to initialize
      */
     private void initializeCustomRooms(int numberOfRooms) {
-        int standardRooms = (int) (numberOfRooms * 0.6);
-        int deluxeRooms = (int) (numberOfRooms * 0.2);
-        int executiveRooms = numberOfRooms - standardRooms - deluxeRooms;
-    
-        int roomNumber;
-    
-        // Allocate Standard rooms on floors 1-3
-        for (int floor = 1; floor <= 3 && standardRooms > 0; floor++) {
-            roomNumber = floor * 100 + 1;
-            int roomsOnThisFloor = Math.min(10, standardRooms);
-            for (int i = 0; i < roomsOnThisFloor; i++, roomNumber++, standardRooms--) {
+        int roomsPerFloor = 10;
+        double standardRoomPercent = 0.60;
+        double deluxeRoomPercent = 0.20;
+
+        int standardRoomCount = (int) Math.ceil(numberOfRooms * standardRoomPercent);
+        int deluxeRoomCount = (int) Math.ceil(numberOfRooms * deluxeRoomPercent);
+        int executiveRoomCount = numberOfRooms - (standardRoomCount + deluxeRoomCount);
+
+        int floor = 1;
+        int roomNumber = floor * 100 + 1; // Start room numbers from 101, 201, 301....
+
+        // Room Distribution
+        while (standardRoomCount > 0 || deluxeRoomCount > 0 || executiveRoomCount > 0) {
+            if (roomNumber % 100 > roomsPerFloor) { // If room number is over 10 then floor count will reset
+                floor++; // Floor count go up
+                roomNumber = floor * 100 + 1; // Updated room number
+            }
+            // Make standard room reach 0 first, then deluxe, and lastly for executive
+            if (standardRoomCount > 0) {
                 roomList.add(new StandardRoom(roomNumber, floor));
-            }
-        }
-    
-        // Allocate Deluxe rooms on floor 4
-        if (deluxeRooms > 0) {
-            int floor = 4;
-            roomNumber = floor * 100 + 1;
-            int roomsOnThisFloor = Math.min(10, deluxeRooms);
-            for (int i = 0; i < roomsOnThisFloor; i++, roomNumber++, deluxeRooms--) {
+                standardRoomCount--;
+            } else if (deluxeRoomCount > 0) {
                 roomList.add(new DeluxeRoom(roomNumber, floor));
-            }
-        }
-    
-        // Allocate Executive rooms on floor 5
-        if (executiveRooms > 0) {
-            int floor = 5;
-            roomNumber = floor * 100 + 1;
-            int roomsOnThisFloor = Math.min(10, executiveRooms);
-            for (int i = 0; i < roomsOnThisFloor; i++, roomNumber++, executiveRooms--) {
+                deluxeRoomCount--;
+            } else if (executiveRoomCount > 0) {
                 roomList.add(new ExecutiveRoom(roomNumber, floor));
+                executiveRoomCount--;
             }
+
+            roomNumber++;
         }
     }
-    
-    
 
     /**
      * Gets the name of the hotel.

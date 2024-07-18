@@ -92,15 +92,21 @@ public class Reservation {
      * @return total bill
      */
     public double calculateBill() {
-        int days;
+        double totalBill = 0.0;
 
-        days = checkOutDate.getDay() - checkInDate.getDay() + 1;
-        double bill = days * room.getBaseRate();
-
-        if (discount != null) {
-            return discount.applyDiscount(bill, this);
+        // Calculate for the price w/o room type and discount
+        for (int day = checkInDate.getDay(); day < checkOutDate.getDay(); day++) {
+            totalBill += room.getPriceForDay(day);
         }
 
-        return bill;
+        // Calculate for the price w/ room but without discount
+        totalBill *= room.getRoomPriceModifier();
+
+        // Add discount
+        if (discount != null) {
+            return discount.applyDiscount(totalBill, this);
+        }
+
+        return totalBill;
     }
 }
