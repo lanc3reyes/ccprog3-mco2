@@ -4,13 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import java.util.*;
 import model.*;
-import model.discount.*;
-import model.room.*;
 
-import model.room.*;
 import model.discount.*;
+import model.room.*;
 
 public class HotelManagementSystem {
     private JFrame frame;
@@ -27,9 +24,6 @@ public class HotelManagementSystem {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         frame.getContentPane().add(tabbedPane);
-
-        hotelList = new JList<>();
-        add(new JScrollPane(), BorderLayout.EAST);
 
         // Create Hotel tab
         JPanel createHotelPanel = new JPanel();
