@@ -1,6 +1,7 @@
 package controller;
 
 import model.Hotel;
+import model.room.*;
 import view.View;
 
 import javax.swing.*;
@@ -78,10 +79,42 @@ public class Controller {
             int choice = JOptionPane.showOptionDialog(view.getFrame(), "Manage Hotel", "Manage Hotel", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
             switch (choice) {
                 case 0:
-                    // change hotel name
+                    String newHotelName = view.promptForNewHotelName();
+                    if (newHotelName != null && !newHotelName.trim().isEmpty()) {
+                        hotel.setName(newHotelName);
+                        view.showMessage("Hotel name changed successfully.");
+                    } else {
+                        view.showMessage("Invalid hotel name.");
+                    }
                     break;
                 case 1:
-                    // add room
+                    int roomName = view.promptForRoomName();
+                    if (roomName <= 0) {
+                        view.showMessage("Invalid room number.");
+                        return;
+                    }
+                    String roomType = view.promptForRoomType();
+                    if (roomType == null) {
+                        view.showMessage("Room type not selected.");
+                        return;
+                    }
+                    Room room;
+                    switch (roomType) {
+                        case "Standard":
+                            room = new StandardRoom(roomName, 6);
+                            break;
+                        case "Deluxe":
+                            room = new DeluxeRoom(roomName, 6);
+                            break;
+                        case "Executive":
+                            room = new ExecutiveRoom(roomName, 6);
+                            break;
+                        default:
+                            view.showMessage("Unknown room type.");
+                            return;
+                    }
+                    hotel.addRoom(room);
+                    view.showMessage("Room added successfully.");
                     break;
                 case 2:
                     // remove room

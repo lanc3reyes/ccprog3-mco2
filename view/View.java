@@ -115,4 +115,23 @@ public class View {
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(frame, message);
     }
+
+    public String promptForNewHotelName() {
+        return JOptionPane.showInputDialog(frame, "Enter new hotel name:");
+    }
+
+    public int promptForRoomName() {
+        String roomNameStr = JOptionPane.showInputDialog(frame, "Enter room number:");
+        try {
+            return Integer.parseInt(roomNameStr);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    public String promptForRoomType() {
+        String[] roomTypes = {"Standard", "Deluxe", "Executive"};
+        int choice = JOptionPane.showOptionDialog(frame, "Select Room Type", "Room Type", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, roomTypes, roomTypes[0]);
+        return (choice == -1) ? null : roomTypes[choice];
+    }
 }
