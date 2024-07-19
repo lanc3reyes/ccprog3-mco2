@@ -1,7 +1,9 @@
 package model;
 
-import model.room.Room;
-import model.discount.Discount;
+import java.util.*;
+import model.*;
+import model.discount.*;
+import model.room.*;
 
 /**
  * The Reservation class represents a reservation made by a guest for a room.
@@ -21,7 +23,7 @@ public class Reservation {
      * @param guest - guest
      * @param checkInDate - check-in date for the reservation
      * @param checkOutDate - check-out date for the reservation
-     * @param room room to be reserved
+     * @param room - room to be reserved
      */
     public Reservation(Guest guest, Date checkInDate, Date checkOutDate, Room room) {
         this.guest = guest;
@@ -84,6 +86,7 @@ public class Reservation {
      */
     public void setDiscount(Discount discount) {
         this.discount = discount;
+        this.bill = calculateBill(); // Recalculate bill when discount is applied
     }
 
     /**
@@ -94,15 +97,15 @@ public class Reservation {
     public double calculateBill() {
         double totalBill = 0.0;
 
-        // Calculate for the price w/o room type and discount
+        // Calculate the price without room type and discount
         for (int day = checkInDate.getDay(); day < checkOutDate.getDay(); day++) {
             totalBill += room.getPriceForDay(day);
         }
 
-        // Calculate for the price w/ room but without discount
+        // Apply room price modifier
         totalBill *= room.getRoomPriceModifier();
 
-        // Add discount
+        // Apply discount if any
         if (discount != null) {
             return discount.applyDiscount(totalBill, this);
         }

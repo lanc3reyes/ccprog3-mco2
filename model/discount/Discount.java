@@ -1,6 +1,9 @@
 package model.discount;
 
-import model.Reservation;
+import java.util.*;
+import model.*;
+import model.discount.*;
+import model.room.*;
 
 /**
  * An abstract class representing a discount.

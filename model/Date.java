@@ -59,7 +59,7 @@ public class Date {
     /**
      * Sets the day of the date.
      * 
-     * @param day new day of the date
+     * @param day - new day of the date
      */
     public void setDay(int day) {
         this.day = day;
@@ -68,7 +68,7 @@ public class Date {
     /**
      * Checks if this date is before another date.
      * 
-     * @param date2 other date to compare to
+     * @param date2 - other date to compare to
      * @return true if this date is before the other date, otherwise it's false
      */
     public boolean isBefore(Date date2) {
@@ -93,11 +93,5 @@ public class Date {
      */
     public boolean isEqual(Date date2) {
         return this.day == date2.day;
-    }
-
-    public Date addDays(int value) {
-        int newDay = this.day + value;
-
-        return new Date(newDay);
     }
 }

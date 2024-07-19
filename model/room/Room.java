@@ -1,13 +1,14 @@
 package model.room;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import model.*;
+import model.discount.*;
+import model.room.*;
 
 import model.Date;
-import model.Reservation;
 
 /**
- * An abstract class representing a room in a hotel.
+ * Abstract class representing a room in a hotel.
  */
 public abstract class Room {
     private int name;

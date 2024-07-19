@@ -1,10 +1,9 @@
 package model;
 
-import java.util.ArrayList;
-import model.room.Room;
-import model.room.StandardRoom;
-import model.room.DeluxeRoom;
-import model.room.ExecutiveRoom;
+import java.util.*;
+import model.*;
+import model.discount.*;
+import model.room.*;
 
 /**
  * The Hotel class represents a hotel with a list of rooms and reservations.
@@ -16,48 +15,13 @@ public class Hotel {
     private ArrayList<Reservation> reservationList;
 
     /**
-     * Constructor for the Hotel class.
-     * 
-     * @param name - name of the hotel
-     */
-    public Hotel(String name) {
-        this.name = name;   
-        this.roomList = new ArrayList<Room>();
-        this.reservationList = new ArrayList<Reservation>();
-        initializeDefaultRooms();
-    }
-
-    /**
      * Constructor for the Hotel class with specified number of rooms
      */
     public Hotel(String name, int numberOfRooms) {
         this.name = name;
         this.roomList = new ArrayList<Room>();
         this.reservationList = new ArrayList<Reservation>();
-        initializeCustomRooms(numberOfRooms);
-    }
-
-    /**
-     * Initialize default rooms (30 Standard, 10 Deluxe, 10 Executive)
-     */
-    private void initializeDefaultRooms() {
-        int roomNumber;
-        for (int floor = 1; floor <= 5; floor++) {
-            roomNumber = floor * 100 + 1; // Start room numbers from 101, 201, 301, 401, 501
-            if (floor <= 3) { // floors 1-3 Standard Rooms
-                for (int i = 0; i < 10; i++, roomNumber++) {
-                    roomList.add(new StandardRoom(roomNumber, floor));
-                }
-            } else if (floor == 4) { // floor 4 Deluxe Rooms
-                for (int i = 0; i < 10; i++, roomNumber++) {
-                    roomList.add(new DeluxeRoom(roomNumber, floor));
-                }
-            } else if (floor == 5) { // floor 5 Executive Rooms
-                for (int i = 0; i < 10; i++, roomNumber++) {
-                    roomList.add(new ExecutiveRoom(roomNumber, floor));
-                }
-            }
-        }
+        initializeRooms(numberOfRooms);
     }
 
     /**
@@ -65,7 +29,7 @@ public class Hotel {
      * 
      * @param numberOfRooms - total number of rooms to initialize
      */
-    private void initializeCustomRooms(int numberOfRooms) {
+    private void initializeRooms(int numberOfRooms) {
         int roomsPerFloor = 10;
         double standardRoomPercent = 0.60;
         double deluxeRoomPercent = 0.20;
@@ -195,6 +159,11 @@ public class Hotel {
             }
         }
         return availableRooms;
+    }
+
+    public ArrayList<Room> getAvailableRoomsForDay(int day) {
+        Date date = new Date(day);
+        return getAvailableRooms(date);
     }
 
     /**

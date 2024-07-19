@@ -1,7 +1,9 @@
 package model.discount;
 
-import model.Reservation;
-import model.Date;
+import java.util.*;
+import model.*;
+import model.discount.*;
+import model.room.*;
 
 /**
  * A class that represents a discount where if a stay is 5 days or longer, 
