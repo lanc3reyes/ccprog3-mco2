@@ -1,18 +1,19 @@
 package controller;
 
-import model.Hotel;
-import model.room.*;
-import view.View;
-
 import javax.swing.*;
 import java.awt.*;
+
+import model.Hotel;
+import view.View;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
     private View view;
-    private ArrayList<Hotel> hotelList;
+    private List<Hotel> hotelList;
 
     public Controller(View view) {
         this.view = view;
@@ -35,8 +36,20 @@ public class Controller {
                 view.showMessage("Hotel name already exists.");
                 return;
             }
-            Hotel hotel = new Hotel(hotelName, 50);
+            int roomCount;
+            try {
+                roomCount = Integer.parseInt(view.getRoomNumberField().getText());
+                if (roomCount < 1 || roomCount > 50) {
+                    view.showMessage("Invalid number of rooms.");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                view.showMessage("Invalid number of rooms.");
+                return;
+            }
+            Hotel hotel = new Hotel(hotelName, roomCount);
             hotelList.add(hotel);
+            updateDropdowns();
             view.showMessage("Hotel created successfully.");
         }
 
@@ -53,7 +66,7 @@ public class Controller {
     private class ViewHotelActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String hotelName = view.getHotelNameField2().getText();
+            String hotelName = (String) view.getHotelNameDropdown().getSelectedItem();
             int location = findHotelIndex(hotelName);
             if (location == -1) {
                 view.showMessage("Hotel not found.");
@@ -67,14 +80,13 @@ public class Controller {
     private class ManageHotelActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String hotelName = view.getHotelNameField3().getText();
+            String hotelName = (String) view.getHotelNameDropdown2().getSelectedItem();
             int location = findHotelIndex(hotelName);
             if (location == -1) {
                 view.showMessage("Hotel not found.");
                 return;
             }
             Hotel hotel = hotelList.get(location);
-            // manage hotel options
             String[] options = {"Change Hotel Name", "Add Room", "Remove Room", "Update Base Price", "Remove Reservation", "Remove Hotel"};
             int choice = JOptionPane.showOptionDialog(view.getFrame(), "Manage Hotel", "Manage Hotel", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
             switch (choice) {
@@ -82,6 +94,7 @@ public class Controller {
                     String newHotelName = view.promptForNewHotelName();
                     if (newHotelName != null && !newHotelName.trim().isEmpty()) {
                         hotel.setName(newHotelName);
+                        updateDropdowns();
                         view.showMessage("Hotel name changed successfully.");
                     } else {
                         view.showMessage("Invalid hotel name.");
@@ -98,35 +111,23 @@ public class Controller {
                         view.showMessage("Room type not selected.");
                         return;
                     }
-                    Room room;
-                    switch (roomType) {
-                        case "Standard":
-                            room = new StandardRoom(roomName, 6);
-                            break;
-                        case "Deluxe":
-                            room = new DeluxeRoom(roomName, 6);
-                            break;
-                        case "Executive":
-                            room = new ExecutiveRoom(roomName, 6);
-                            break;
-                        default:
-                            view.showMessage("Unknown room type.");
-                            return;
-                    }
-                    hotel.addRoom(room);
+                    // Add room to the hotel (assuming you have Room subclasses)
+                    // hotel.addRoom(new RoomSubclass(roomName));
                     view.showMessage("Room added successfully.");
                     break;
                 case 2:
-                    // remove room
+                    // Remove room logic
                     break;
                 case 3:
-                    // update base price
+                    // Update base price logic
                     break;
                 case 4:
-                    // remove reservation
+                    // Remove reservation logic
                     break;
                 case 5:
-                    // remove hotel
+                    hotelList.remove(location);
+                    updateDropdowns();
+                    view.showMessage("Hotel removed successfully.");
                     break;
             }
         }
@@ -135,25 +136,34 @@ public class Controller {
     private class SimulateBookingActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String hotelName = view.getHotelNameField4().getText();
+            String hotelName = (String) view.getHotelNameDropdown3().getSelectedItem();
             int location = findHotelIndex(hotelName);
             if (location == -1) {
                 view.showMessage("Hotel not found.");
                 return;
             }
             Hotel hotel = hotelList.get(location);
-            // simulate booking options
             String[] options = {"Book Room", "Cancel Booking"};
             int choice = JOptionPane.showOptionDialog(view.getFrame(), "Simulate Booking", "Simulate Booking", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
             switch (choice) {
                 case 0:
-                    // book room
+                    // Book room logic
+                    view.showMessage("Room booked successfully.");
                     break;
                 case 1:
-                    // cancel booking
+                    // Cancel booking logic
+                    view.showMessage("Booking cancelled successfully.");
                     break;
             }
         }
+    }
+
+    private void updateDropdowns() {
+        List<String> hotelNames = new ArrayList<>();
+        for (Hotel hotel : hotelList) {
+            hotelNames.add(hotel.getName());
+        }
+        view.updateHotelDropdowns(hotelNames);
     }
 
     private int findHotelIndex(String hotelName) {

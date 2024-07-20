@@ -2,14 +2,17 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class View {
     private JFrame frame;
     private JTabbedPane tabbedPane;
     private JTextField hotelNameField;
-    private JTextField hotelNameField2;
-    private JTextField hotelNameField3;
-    private JTextField hotelNameField4;
+    private JTextField roomNumberField;
+
+    private JComboBox<String> hotelNameDropdown;
+    private JComboBox<String> hotelNameDropdown2; // for manage hotel tab
+    private JComboBox<String> hotelNameDropdown3; // for simulate booking tab
 
     private JButton createHotelButton;
     private JButton viewHotelButton;
@@ -24,6 +27,9 @@ public class View {
         frame = new JFrame("Hotel Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        frame.setPreferredSize(new Dimension(500, 200));  // Set your desired dimensions
+        frame.setResizable(false);
+
         tabbedPane = new JTabbedPane();
         frame.getContentPane().add(tabbedPane);
 
@@ -32,9 +38,15 @@ public class View {
         createHotelPanel.setLayout(new GridLayout(0, 2));
         JLabel hotelNameLabel = new JLabel("Hotel Name:");
         hotelNameField = new JTextField();
+
+        JLabel roomNumberLabel = new JLabel("Number of Rooms:");
+        roomNumberField = new JTextField();
+
         createHotelButton = new JButton("Create Hotel");
         createHotelPanel.add(hotelNameLabel);
         createHotelPanel.add(hotelNameField);
+        createHotelPanel.add(roomNumberLabel);
+        createHotelPanel.add(roomNumberField);
         createHotelPanel.add(createHotelButton);
         tabbedPane.addTab("Create Hotel", createHotelPanel);
 
@@ -42,10 +54,10 @@ public class View {
         JPanel viewHotelPanel = new JPanel();
         viewHotelPanel.setLayout(new GridLayout(0, 2));
         JLabel hotelNameLabel2 = new JLabel("Hotel Name:");
-        hotelNameField2 = new JTextField();
+        hotelNameDropdown = new JComboBox<>();
         viewHotelButton = new JButton("View Hotel");
         viewHotelPanel.add(hotelNameLabel2);
-        viewHotelPanel.add(hotelNameField2);
+        viewHotelPanel.add(hotelNameDropdown);
         viewHotelPanel.add(viewHotelButton);
         tabbedPane.addTab("View Hotel", viewHotelPanel);
 
@@ -53,10 +65,10 @@ public class View {
         JPanel manageHotelPanel = new JPanel();
         manageHotelPanel.setLayout(new GridLayout(0, 2));
         JLabel hotelNameLabel3 = new JLabel("Hotel Name:");
-        hotelNameField3 = new JTextField();
+        hotelNameDropdown2 = new JComboBox<>();
         manageHotelButton = new JButton("Manage Hotel");
         manageHotelPanel.add(hotelNameLabel3);
-        manageHotelPanel.add(hotelNameField3);
+        manageHotelPanel.add(hotelNameDropdown2);
         manageHotelPanel.add(manageHotelButton);
         tabbedPane.addTab("Manage Hotel", manageHotelPanel);
 
@@ -64,10 +76,10 @@ public class View {
         JPanel simulateBookingPanel = new JPanel();
         simulateBookingPanel.setLayout(new GridLayout(0, 2));
         JLabel hotelNameLabel4 = new JLabel("Hotel Name:");
-        hotelNameField4 = new JTextField();
+        hotelNameDropdown3 = new JComboBox<>();
         simulateBookingButton = new JButton("Simulate Booking");
         simulateBookingPanel.add(hotelNameLabel4);
-        simulateBookingPanel.add(hotelNameField4);
+        simulateBookingPanel.add(hotelNameDropdown3);
         simulateBookingPanel.add(simulateBookingButton);
         tabbedPane.addTab("Simulate Booking", simulateBookingPanel);
 
@@ -84,16 +96,20 @@ public class View {
         return hotelNameField;
     }
 
-    public JTextField getHotelNameField2() {
-        return hotelNameField2;
+    public JTextField getRoomNumberField() {
+        return roomNumberField;
     }
 
-    public JTextField getHotelNameField3() {
-        return hotelNameField3;
+    public JComboBox<String> getHotelNameDropdown() {
+        return hotelNameDropdown;
     }
 
-    public JTextField getHotelNameField4() {
-        return hotelNameField4;
+    public JComboBox<String> getHotelNameDropdown2() {
+        return hotelNameDropdown2;
+    }
+
+    public JComboBox<String> getHotelNameDropdown3() {
+        return hotelNameDropdown3;
     }
 
     public JButton getCreateHotelButton() {
@@ -133,5 +149,17 @@ public class View {
         String[] roomTypes = {"Standard", "Deluxe", "Executive"};
         int choice = JOptionPane.showOptionDialog(frame, "Select Room Type", "Room Type", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, roomTypes, roomTypes[0]);
         return (choice == -1) ? null : roomTypes[choice];
+    }
+
+    public void updateHotelDropdowns(List<String> hotelNames) {
+        hotelNameDropdown.removeAllItems();
+        hotelNameDropdown2.removeAllItems();
+        hotelNameDropdown3.removeAllItems();
+
+        for (String name : hotelNames) {
+            hotelNameDropdown.addItem(name);
+            hotelNameDropdown2.addItem(name);
+            hotelNameDropdown3.addItem(name);
+        }
     }
 }
