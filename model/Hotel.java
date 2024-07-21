@@ -30,36 +30,53 @@ public class Hotel {
      * @param numberOfRooms - total number of rooms to initialize
      */
     private void initializeRooms(int numberOfRooms) {
-        int roomsPerFloor = 10;
-        double standardRoomPercent = 0.60;
-        double deluxeRoomPercent = 0.20;
 
-        int standardRoomCount = (int) Math.ceil(numberOfRooms * standardRoomPercent);
-        int deluxeRoomCount = (int) Math.ceil(numberOfRooms * deluxeRoomPercent);
-        int executiveRoomCount = numberOfRooms - (standardRoomCount + deluxeRoomCount);
+        if (numberOfRooms > 4) {
+            int roomsPerFloor = 10;
+            double standardRoomPercent = 0.60;
+            double deluxeRoomPercent = 0.20;
 
-        int floor = 1;
-        int roomNumber = floor * 100 + 1; // Start room numbers from 101, 201, 301....
+            int standardRoomCount = (int) Math.ceil(numberOfRooms * standardRoomPercent);
+            int deluxeRoomCount = (int) Math.ceil(numberOfRooms * deluxeRoomPercent);
+            int executiveRoomCount = numberOfRooms - (standardRoomCount + deluxeRoomCount);
 
-        // Room Distribution
-        while (standardRoomCount > 0 || deluxeRoomCount > 0 || executiveRoomCount > 0) {
-            if (roomNumber % 100 > roomsPerFloor) { // If room number is over 10 then floor count will reset
-                floor++; // Floor count go up
-                roomNumber = floor * 100 + 1; // Updated room number
+            int floor = 1;
+            int roomNumber = floor * 100 + 1; // Start room numbers from 101, 201, 301....
+
+            // Room Distribution
+            while (standardRoomCount > 0 || deluxeRoomCount > 0 || executiveRoomCount > 0) {
+                if (roomNumber % 100 > roomsPerFloor) { // If room number is over 10 then floor count will reset
+                    floor++; // Floor count go up
+                    roomNumber = floor * 100 + 1; // Updated room number
+                }
+                // Make standard room reach 0 first, then deluxe, and lastly for executive
+                if (standardRoomCount > 0) {
+                    roomList.add(new StandardRoom(roomNumber, floor));
+                    standardRoomCount--;
+                } else if (deluxeRoomCount > 0) {
+                    roomList.add(new DeluxeRoom(roomNumber, floor));
+                    deluxeRoomCount--;
+                } else if (executiveRoomCount > 0) {
+                    roomList.add(new ExecutiveRoom(roomNumber, floor));
+                    executiveRoomCount--;
+                }
+
+                roomNumber++;
             }
-            // Make standard room reach 0 first, then deluxe, and lastly for executive
-            if (standardRoomCount > 0) {
-                roomList.add(new StandardRoom(roomNumber, floor));
-                standardRoomCount--;
-            } else if (deluxeRoomCount > 0) {
-                roomList.add(new DeluxeRoom(roomNumber, floor));
-                deluxeRoomCount--;
-            } else if (executiveRoomCount > 0) {
-                roomList.add(new ExecutiveRoom(roomNumber, floor));
-                executiveRoomCount--;
-            }
-
-            roomNumber++;
+        } else if (numberOfRooms == 4) {
+            roomList.add(new StandardRoom(101, 1));
+            roomList.add(new StandardRoom(102, 1));
+            roomList.add(new DeluxeRoom(103, 1));
+            roomList.add(new ExecutiveRoom(104, 1));
+        } else if (numberOfRooms == 3) {
+            roomList.add(new StandardRoom(101, 1));
+            roomList.add(new DeluxeRoom(102, 1));
+            roomList.add(new ExecutiveRoom(103, 1));
+        } else if (numberOfRooms == 2) {
+            roomList.add(new StandardRoom(101, 1));
+            roomList.add(new DeluxeRoom(102, 1));
+        } else if (numberOfRooms == 1) {
+            roomList.add(new StandardRoom(101, 1));
         }
     }
 
@@ -161,10 +178,10 @@ public class Hotel {
         return availableRooms;
     }
 
-    public ArrayList<Room> getAvailableRoomsForDay(int day) {
-        Date date = new Date(day);
-        return getAvailableRooms(date);
-    }
+    // public ArrayList<Room> getAvailableRoomsForDay(int day) {
+    //     Date date = new Date(day);
+    //     return getAvailableRooms(date);
+    // }
 
     /**
      * Calculates the total earnings from all reservations.

@@ -25,11 +25,12 @@ public class Reservation {
      * @param checkOutDate - check-out date for the reservation
      * @param room - room to be reserved
      */
-    public Reservation(Guest guest, Date checkInDate, Date checkOutDate, Room room) {
+    public Reservation(Guest guest, Date checkInDate, Date checkOutDate, Room room, String discountString) {
         this.guest = guest;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.room = room;
+        setDiscountByString(discountString);
         this.bill = calculateBill();
         this.discount = null;
     }
@@ -77,6 +78,23 @@ public class Reservation {
      */
     public double getBill() {
         return bill;
+    }
+
+    /**
+     * Sets the discount by discount string
+     * 
+     * @param discountString - discount code
+     */
+    public void setDiscountByString(String discountString) {
+        if ("I_WORK_HERE".equalsIgnoreCase(discountString)) {
+            this.discount = new IWorkHereDiscount();
+        } else if ("STAY4_GET1".equalsIgnoreCase(discountString)) {
+            this.discount = new Stay4Get1Discount();
+        } else if ("PAYDAY".equalsIgnoreCase(discountString)) {
+            this.discount = new PaydayDiscount();
+        } else {
+            this.discount = null;
+        }
     }
 
     /**
