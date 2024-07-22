@@ -13,11 +13,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 
 public class Controller {
     private View view;
-    private List<Hotel> hotelList;
+    private ArrayList<Hotel> hotelList;
 
     public Controller(View view) {
         this.view = view;
@@ -67,15 +66,6 @@ public class Controller {
             view.getHotelNameField().setText("");
             view.getHotelCapacityField().setText("");
         }
-
-        private boolean isHotelNameUnique(String hotelName) {
-            for (Hotel hotel : hotelList) {
-                if (hotel.getName().equals(hotelName)) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     private class ViewLowLevelInformationActionListener implements ActionListener {
@@ -92,15 +82,12 @@ public class Controller {
             int choice = JOptionPane.showOptionDialog(view.getFrame(), "", "Get Details", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[2]);
             switch (choice) {
                 case 0:
-                    // Select Reservation
                     handleSelectReservation(hotel);
                     break;
                 case 1:
-                    // Select Room
                     handleSelectRoom(hotel);
                     break;
                 case 2:
-                    // Select Date
                     handleSelectDate(hotel);
                     break;
             }
@@ -134,7 +121,7 @@ public class Controller {
                        .append("\nRoom: ").append(reservation.getRoom().getRoomName())
                        .append("\nCheck-In: ").append(reservation.getCheckInDate().getMonth()).append("/").append(reservation.getCheckInDate().getDay()).append("/").append(reservation.getCheckInDate().getYear())
                        .append("\nCheck-Out: ").append(reservation.getCheckOutDate().getMonth()).append("/").append(reservation.getCheckOutDate().getDay()).append("/").append(reservation.getCheckOutDate().getYear())
-                       .append("\nTotal Bill: ").append(reservation.getBill());
+                       .append("\nTotal Bill: ").append(reservation.getBill()).append("\n\n");
             }
         
             view.showMessage(message.toString());
@@ -152,7 +139,7 @@ public class Controller {
             textArea.setEditable(false);
             StringBuilder message = new StringBuilder("");
             for (Room room : roomList) {
-                message.append("Room ").append(room.getRoomName()).append("\n");
+                message.append("Room ").append(room.getRoomName()).append(" ").append(room.getRoomType()).append("\n");
             }
             textArea.setText(message.toString());
             
@@ -214,7 +201,7 @@ public class Controller {
             } else {
                 StringBuilder message = new StringBuilder("Available rooms on December " + dateString + ", 2023:\n");
                 for (Room room : availableRooms) {
-                    message.append("Room ").append(room.getRoomName()).append("\n");
+                    message.append("Room ").append(room.getRoomName()).append(" ").append(room.getRoomType()).append("\n");
                 }
 
                 JTextArea textArea = new JTextArea(message.toString());
@@ -265,22 +252,194 @@ public class Controller {
                     break;
                 case 1:
                     // remove reservation
+                    String guestName = JOptionPane.showInputDialog(view.getFrame(), "Enter guest name:");
+
+                    if (guestName == null || guestName.isEmpty()) {
+                        view.showMessage("Guest name input is required.");
+                        return;
+                    }
+                
+                    ArrayList<Reservation> guestReservations = new ArrayList<>();
+                    for (Room room : hotel.getRoomList()) {
+                        for (Reservation reservation : room.getReservationList()) {
+                            if (reservation.getGuest().getName().equals(guestName)) {
+                                guestReservations.add(reservation);
+                            }
+                        }
+                    }
+                
+                    if (guestReservations.isEmpty()) {
+                        view.showMessage("No reservations found for guest: " + guestName);
+                        return;
+                    }
+                
+                    StringBuilder message = new StringBuilder("Reservations for " + guestName + ":\n");
+                    for (int i = 0; i < guestReservations.size(); i++) {
+                        Reservation reservation = guestReservations.get(i);
+                        message.append("[").append(i + 1).append("] Room: ").append(reservation.getRoom().getRoomName())
+                               .append("\n   Check-In: ").append(reservation.getCheckInDate().getMonth()).append("/").append(reservation.getCheckInDate().getDay()).append("/").append(reservation.getCheckInDate().getYear())
+                               .append("\n   Check-Out: ").append(reservation.getCheckOutDate().getMonth()).append("/").append(reservation.getCheckOutDate().getDay()).append("/").append(reservation.getCheckOutDate().getYear())
+                               .append("\n   Total Bill: ").append(reservation.getBill()).append("\n\n");
+                    }
+                
+                    String reservationIndexString = JOptionPane.showInputDialog(view.getFrame(), message.toString() + "\nEnter the number of the reservation to remove:");
+                    if (reservationIndexString == null || reservationIndexString.isEmpty()) {
+                        view.showMessage("Reservation number input is required.");
+                        return;
+                    }
+                
+                    try {
+                        int reservationIndex = Integer.parseInt(reservationIndexString) - 1;
+                        if (reservationIndex < 0 || reservationIndex >= guestReservations.size()) {
+                            view.showMessage("Invalid reservation number.");
+                            return;
+                        }
+                
+                        Reservation reservationToRemove = guestReservations.get(reservationIndex);
+                        reservationToRemove.getRoom().removeReservation(reservationToRemove);
+                        view.showMessage("Reservation removed successfully.");
+                    } catch (NumberFormatException ex) {
+                        view.showMessage("Invalid reservation number format.");
+                    }
                     break;
                 case 2:
                     // update base price
-                    // how do I update the base price?????
                     // iterate through all rooms
+                    JPanel basePricePanel = new JPanel(new GridLayout(0, 1));
+                    JTextField basePriceField = new JTextField(20);
+                    basePricePanel.add(new JLabel("Enter new base price:"));
+                    basePricePanel.add(basePriceField);
+                
+                    int basePriceResult = JOptionPane.showConfirmDialog(view.getFrame(), basePricePanel, 
+                        "Update Base Price", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                
+                    if (basePriceResult == JOptionPane.OK_OPTION) {
+                        try {
+                            double newBasePrice = Double.parseDouble(basePriceField.getText());
+                            // Iterate through all rooms and update the base price
+                            if (newBasePrice < 100) {
+                                view.showMessage("Base price should be at least 100 units of price.");
+                                return;
+                            }
+                            for (Room room : hotel.getRoomList()) {
+                                room.setBaseRate(newBasePrice);
+                            }
+                            view.showMessage("Base price updated successfully for all rooms.");
+                        } catch (NumberFormatException ex) {
+                            view.showMessage("Invalid price format.");
+                        }
+                    }
                     break;
                 case 3:
                     // remove room
+                    JPanel removeRoomPanel = new JPanel(new GridLayout(0, 1));
+                    JTextField roomNumberField = new JTextField(20);
+                    removeRoomPanel.add(new JLabel("Enter room number:"));
+                    removeRoomPanel.add(roomNumberField);
+                
+                    int removeResult = JOptionPane.showConfirmDialog(view.getFrame(), removeRoomPanel, 
+                        "Remove Room", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                
+                    if (removeResult == JOptionPane.OK_OPTION) {
+                        try {
+                            int roomNumber = Integer.parseInt(roomNumberField.getText());
+                            Room roomToRemove = hotel.getRoomList().stream()
+                                .filter(room -> room.getRoomName() == roomNumber)
+                                .findFirst()
+                                .orElse(null);
+                
+                            if (roomToRemove == null) {
+                                view.showMessage("Room not found.");
+                            } else if (!roomToRemove.getReservationList().isEmpty()) {
+                                view.showMessage("Cannot remove room with active reservations.");
+                            } else {
+                                hotel.removeRoom(roomToRemove);
+                                view.showMessage("Room removed successfully.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            view.showMessage("Invalid room number format.");
+                        }
+                    }
                     break;
                 case 4:
-                    // add room
-                    // you can't add if the limit is reached which is 50
+                    if (hotel.getRoomList().size() >= 50) {
+                        view.showMessage("Cannot add a room as maximum capacity is reached.");
+                        return;
+                    }
+
+                    // Create the room type selection panel
+                    JPanel roomTypePanel = new JPanel(new GridLayout(0, 1));
+                    JRadioButton standardButton = new JRadioButton("Standard");
+                    JRadioButton deluxeButton = new JRadioButton("Deluxe");
+                    JRadioButton executiveButton = new JRadioButton("Executive");
+
+                    // Group the radio buttons to allow only one selection
+                    ButtonGroup group = new ButtonGroup();
+                    group.add(standardButton);
+                    group.add(deluxeButton);
+                    group.add(executiveButton);
+
+                    roomTypePanel.add(standardButton);
+                    roomTypePanel.add(deluxeButton);
+                    roomTypePanel.add(executiveButton);
+
+                    int result = JOptionPane.showConfirmDialog(view.getFrame(), roomTypePanel, 
+                        "Select Room Type", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                    if (result == JOptionPane.OK_OPTION) {
+                        String roomType;
+                        if (standardButton.isSelected()) {
+                            roomType = "Standard";
+                        } else if (deluxeButton.isSelected()) {
+                            roomType = "Deluxe";
+                        } else if (executiveButton.isSelected()) {
+                            roomType = "Executive";
+                        } else {
+                            view.showMessage("Please select a room type.");
+                            break;
+                        }
+
+                        // Get the latest room number
+                        int latestRoomNumber = hotel.getRoomList().stream().mapToInt(Room::getRoomName)
+                        .max()
+                        .orElse(0);
+
+                        int newRoomNumber;
+                        int newFloorNumber;
+                        
+                        if (latestRoomNumber % 100 == 10) {
+                            newFloorNumber = latestRoomNumber / 100 + 1;
+                            newRoomNumber = newFloorNumber * 100 + 1;
+                        } else {
+                            newFloorNumber = latestRoomNumber / 100;
+                            newRoomNumber = latestRoomNumber + 1;
+                        }
+
+                        Room newRoom;
+                        if (roomType.equals("Standard")) {
+                            newRoom = new StandardRoom(newRoomNumber, newFloorNumber);
+                        } else if (roomType.equals("Deluxe")) {
+                            newRoom = new DeluxeRoom(newRoomNumber, newFloorNumber);
+                        } else {
+                            newRoom = new ExecutiveRoom(newRoomNumber, newFloorNumber);
+                        }
+
+                        hotel.addRoom(newRoom);
+                        
+
+                        view.showMessage(roomType + " Room added successfully.");
+                    }
+
                     break;
                 case 5:
                     String newHotelName = view.promptForNewHotelName();
                     if (newHotelName != null && !newHotelName.trim().isEmpty()) {
+
+                        if(isHotelNameUnique(newHotelName) == false) {
+                            view.showMessage("Hotel name already taken.");
+                            return;
+                        }
+                        
                         hotel.setName(newHotelName);
                         updateDropdowns();
                         view.showMessage("Hotel name changed successfully.");
@@ -471,7 +630,7 @@ public class Controller {
     }
     
     private void updateDropdowns() {
-        List<String> hotelNames = new ArrayList<>();
+        ArrayList<String> hotelNames = new ArrayList<>();
         for (Hotel hotel : hotelList) {
             hotelNames.add(hotel.getName());
         }
@@ -485,5 +644,14 @@ public class Controller {
             }
         }
         return -1;
+    }
+
+    private boolean isHotelNameUnique(String hotelName) {
+        for (Hotel hotel : hotelList) {
+            if (hotel.getName().equals(hotelName)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
