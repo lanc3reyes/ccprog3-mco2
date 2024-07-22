@@ -14,16 +14,26 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 
+/**
+ * The Controller class manages the interaction between the View and Model components.
+ */
 public class Controller {
     private View view;
     private ArrayList<Hotel> hotelList;
 
+    /**
+     * Constructor for the Controller class.
+     * @param view - view object
+     */
     public Controller(View view) {
         this.view = view;
         this.hotelList = new ArrayList<>();
         initController();
     }
 
+    /**
+     * Initializes the necessary controllers.
+     */
     private void initController() {
         view.getCreateHotelButton().addActionListener(new CreateHotelActionListener());
         view.getLowLevelInformationButton().addActionListener(new ViewLowLevelInformationActionListener());
@@ -32,6 +42,9 @@ public class Controller {
         view.getSimulateBookingButton().addActionListener(new SimulateBookingActionListener());
     }
 
+    /**
+     * ActionListener for creating a hotel.
+     */
     private class CreateHotelActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -59,24 +72,31 @@ public class Controller {
                 view.showMessage("Please enter a numerical value.");
                 return;
             }
-            Hotel hotel = new Hotel(hotelName, hotelCapacity);
-            hotelList.add(hotel);
-            updateDropdowns();
+            Hotel hotel = new Hotel(hotelName, hotelCapacity); // Creates a hotel object.
+            hotelList.add(hotel); // Adds the new hotel object to the list of hotels.
+            updateDropdowns(); // Updates the dropdown as there is a newly created hotel was added to the list of hotels.
             view.showMessage("Hotel created successfully.");
+
+            // This makes the text field empty after a successful response
             view.getHotelNameField().setText("");
             view.getHotelCapacityField().setText("");
         }
     }
 
+    /**
+     * ActionListener for viewing low-level information of a hotel.
+     */
     private class ViewLowLevelInformationActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             String hotelName = (String) view.getHotelNameDropdown().getSelectedItem();
-            int location = findHotelIndex(hotelName);
+            int location = findHotelIndex(hotelName); // Gets the index of the hotel in the list of hotels.
             if (location == -1) {
                 view.showMessage("Hotel not found.");
                 return;
             }
+
+            // Stores the selected hotel in the hotel variable.
             Hotel hotel = hotelList.get(location);
             String[] options = {"Select Reservation", "Select Room", "Select Date"};
             int choice = JOptionPane.showOptionDialog(view.getFrame(), "", "Get Details", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[2]);
@@ -93,6 +113,10 @@ public class Controller {
             }
         }
 
+        /**
+         * Handles selecting a reservation for a guest.
+         * @param hotel - the hotel where the reservation is being made
+         */
         private void handleSelectReservation(Hotel hotel) {
             String guestName = JOptionPane.showInputDialog(view.getFrame(), "Enter guest name:");
 
@@ -101,6 +125,7 @@ public class Controller {
                 return;
             }
 
+            // A list of reservations made by a specific guest.
             ArrayList<Reservation> guestReservations = new ArrayList<>();
             for (Room room : hotel.getRoomList()) {
                 for (Reservation reservation : room.getReservationList()) {
@@ -115,6 +140,7 @@ public class Controller {
                 return;
             }
 
+            // Prints the reservations made by a specific guest.
             StringBuilder message = new StringBuilder("Reservations for " + guestName + ":\n");
             for (Reservation reservation : guestReservations) {
                 message.append("Guest Name: ").append(reservation.getGuest().getName())
@@ -127,14 +153,18 @@ public class Controller {
             view.showMessage(message.toString());
         }
 
+        /**
+         * Handles selecting a room in the hotel.
+         * @param hotel - the hotel where the room selection is being made
+         */
         private void handleSelectRoom(Hotel hotel) {
             // Get the list of rooms
             ArrayList<Room> roomList = hotel.getRoomList();
             
-            // Create a panel to hold the room list and input field
+            // Create a panel to hold the room list and input field.
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             
-            // Create a text area to display the list of rooms
+            // Create a text area to display the list of rooms.
             JTextArea textArea = new JTextArea(10, 30);
             textArea.setEditable(false);
             StringBuilder message = new StringBuilder("");
@@ -143,26 +173,25 @@ public class Controller {
             }
             textArea.setText(message.toString());
             
-            // Create an input field for the room number
+            // Create an input field for the room number.
             JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             JLabel inputLabel = new JLabel("Enter room number:");
             JTextField roomNumberField = new JTextField(10);
             inputPanel.add(inputLabel);
             inputPanel.add(roomNumberField);
             
-            // Add components to the panel
+            // Add components to the panel.
             panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
             panel.add(inputPanel, BorderLayout.SOUTH);
             
-            // Show the dialog with the custom panel
+            // Show the dialog with the custom panel.
             int result = JOptionPane.showConfirmDialog(view.getFrame(), panel, "Room List", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             
             if (result == JOptionPane.OK_OPTION) {
     
-                // Then prompt the user to enter a room number
+                // Prompts the user to enter a room number.
                 String roomNumberString = roomNumberField.getText();
     
-                // Input validation
                 if (roomNumberString == null || roomNumberString.isEmpty()) {
                     view.showMessage("Room number input is required.");
                     return;
@@ -182,6 +211,10 @@ public class Controller {
             }
         }
 
+        /**
+         * Handles selecting a date to check available rooms.
+         * @param hotel - the hotel where the room availability is being checked
+         */
         private void handleSelectDate(Hotel hotel) {
             String dateString = JOptionPane.showInputDialog(view.getFrame(), "Enter day:");
     
@@ -191,9 +224,10 @@ public class Controller {
             }
     
             int date = Integer.parseInt(dateString);
-    
+
+            // Creates an instance of date based on the integer variable.
             Date day = new Date(date);
-    
+            
             ArrayList<Room> availableRooms = hotel.getAvailableRooms(day);
     
             if (availableRooms.isEmpty()) {
@@ -209,15 +243,17 @@ public class Controller {
                 JScrollPane scrollPane = new JScrollPane(textArea);
                 scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
                 scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                scrollPane.setPreferredSize(new Dimension(400, 300));  // Set preferred size for the scroll pane
-
-                // Show the scroll pane in a message dialog
+                scrollPane.setPreferredSize(new Dimension(400, 300));
+                
                 JOptionPane.showMessageDialog(view.getFrame(), scrollPane, "Available Rooms", JOptionPane.PLAIN_MESSAGE);
             }
         }
 
     }
 
+    /**
+     * ActionListener for viewing high-level information of a hotel.
+     */
     private class ViewHighLevelInformationActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -232,6 +268,9 @@ public class Controller {
         }
     }
 
+    /**
+     * ActionListener for managing a hotel.
+     */
     private class ManageHotelActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -246,12 +285,13 @@ public class Controller {
             int choice = JOptionPane.showOptionDialog(view.getFrame(), "", "Manage Hotel", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             switch (choice) {
                 case 0:
+                    // Remove hotel
                     hotelList.remove(location);
                     updateDropdowns();
                     view.showMessage("Hotel removed successfully.");
                     break;
                 case 1:
-                    // remove reservation
+                    // Remove reservation
                     String guestName = JOptionPane.showInputDialog(view.getFrame(), "Enter guest name:");
 
                     if (guestName == null || guestName.isEmpty()) {
@@ -303,8 +343,8 @@ public class Controller {
                     }
                     break;
                 case 2:
-                    // update base price
-                    // iterate through all rooms
+                    // Update base price
+                    // Iterate the new base price through all rooms.
                     JPanel basePricePanel = new JPanel(new GridLayout(0, 1));
                     JTextField basePriceField = new JTextField(20);
                     basePricePanel.add(new JLabel("Enter new base price:"));
@@ -331,7 +371,7 @@ public class Controller {
                     }
                     break;
                 case 3:
-                    // remove room
+                    // Remove room
                     JPanel removeRoomPanel = new JPanel(new GridLayout(0, 1));
                     JTextField roomNumberField = new JTextField(20);
                     removeRoomPanel.add(new JLabel("Enter room number:"));
@@ -362,6 +402,7 @@ public class Controller {
                     }
                     break;
                 case 4:
+                    // Add room
                     if (hotel.getRoomList().size() >= 50) {
                         view.showMessage("Cannot add a room as maximum capacity is reached.");
                         return;
@@ -432,6 +473,7 @@ public class Controller {
 
                     break;
                 case 5:
+                    // Rename hotel
                     String newHotelName = view.promptForNewHotelName();
                     if (newHotelName != null && !newHotelName.trim().isEmpty()) {
 
@@ -451,6 +493,9 @@ public class Controller {
         }
     }
 
+    /**
+     * ActionListener for simulating a booking.
+     */
     private class SimulateBookingActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -507,7 +552,8 @@ public class Controller {
                 String checkInDateString = checkInDateField.getText();
                 String checkOutDateString = checkOutDateField.getText();
                 String discountString = discountField.getText();
-    
+                
+                // Discount text field is optional.
                 if (guestName.isEmpty() || checkInDateString.isEmpty() || checkOutDateString.isEmpty()) {
                     view.showMessage("All fields must be filled out.");
                     return;
@@ -546,17 +592,26 @@ public class Controller {
                 showAvailableRoomsDialog(hotel, guestName, checkInDate, checkOutDate, discountString);
             }
         }
-    
+        
+        /**
+         * Displays available rooms for the given date range and processes the booking.
+         * @param hotel - the hotel where the booking is being made
+         * @param guestName - name of the guest
+         * @param checkInDate - check-in date
+         * @param checkOutDate - check-out date
+         * @param discountString - discount code
+         */
         private void showAvailableRoomsDialog(Hotel hotel, String guestName, int checkInDate, int checkOutDate, String discountString) {
             JPanel roomPanel = new JPanel(new BorderLayout(10, 10));
     
             JTextArea roomListArea = new JTextArea(10, 30);
             roomListArea.setEditable(false);
             StringBuilder roomListBuilder = new StringBuilder("");
-            // Add logic to get available rooms based on dates and room type
 
+            // A list that contains all list of rooms available on a range of dates.
             ArrayList<ArrayList<Room>> nestedRoomList = new ArrayList<ArrayList<Room>>();
 
+            // Iterates the day and adds it to the nested list.
             for (int i = checkInDate; i < checkOutDate; i++) {
                 Date day = new Date(i);
                 nestedRoomList.add(hotel.getAvailableRooms(day));
@@ -567,11 +622,13 @@ public class Controller {
                 return;
             }
 
+            // Hash set to remove duplicate rooms
             HashSet<Room> uniqueRooms = new HashSet<>(nestedRoomList.get(0));
             for (int i = 1; i < nestedRoomList.size(); i++) {
                 uniqueRooms.retainAll(nestedRoomList.get(i));
             }   
-        
+            
+            // Sort the rooms by room number
             ArrayList<Room> sortedRooms = new ArrayList<>(uniqueRooms);
             sortedRooms.sort(Comparator.comparingInt(Room::getRoomName));
 
@@ -614,13 +671,12 @@ public class Controller {
                         hotel.addReservation(reservation);
                         room.addReservation(reservation);
 
-                        // Simulate booking process
                         String bookingMessage = "Booking successful!\nGuest: " + guestName +
                                 "\nRoom: " + roomNumber +
                                 "\nCheck-In: " + checkInDate +
                                 "\nCheck-Out: " + checkOutDate;
 
-                        view.showMessage(bookingMessage); // Or JOptionPane.showMessageDialog(view.getFrame(), bookingMessage, "Success", JOptionPane.INFORMATION_MESSAGE);
+                        view.showMessage(bookingMessage);
                     } catch (NumberFormatException ex) {
                         view.showMessage("Invalid room number format.");
                     }
@@ -629,6 +685,9 @@ public class Controller {
         }
     }
     
+    /**
+     * Updates the dropdown menus with hotel names.
+     */
     private void updateDropdowns() {
         ArrayList<String> hotelNames = new ArrayList<>();
         for (Hotel hotel : hotelList) {
@@ -637,6 +696,11 @@ public class Controller {
         view.updateHotelDropdowns(hotelNames);
     }
 
+    /**
+     * Finds the index of a hotel in the hotel list.
+     * @param hotelName - name of the hotel
+     * @return index of the hotel in the list, or -1 if not found
+     */
     private int findHotelIndex(String hotelName) {
         for (int i = 0; i < hotelList.size(); i++) {
             if (hotelList.get(i).getName().equals(hotelName)) {
@@ -646,6 +710,11 @@ public class Controller {
         return -1;
     }
 
+    /**
+     * Checks if a hotel name is unique.
+     * @param hotelName - name of the hotel
+     * @return true if the hotel name is unique, false otherwise
+     */
     private boolean isHotelNameUnique(String hotelName) {
         for (Hotel hotel : hotelList) {
             if (hotel.getName().equals(hotelName)) {

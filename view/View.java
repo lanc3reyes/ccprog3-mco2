@@ -7,6 +7,9 @@ import javax.swing.text.AbstractDocument;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * The View class handles the graphical user interface of the application.
+ */
 public class View {
     // Main Components
     private JFrame frame;
@@ -27,10 +30,17 @@ public class View {
     private JButton manageHotelButton;
     private JButton simulateBookingButton;
 
+    /**
+     * Constructor for the View class.
+     * Initializes the GUI components.
+     */
     public View() {
         createGUI();
-    }
+    }  
 
+    /**
+     * Creates the graphical user interface.
+     */
     private void createGUI() {
         frame = new JFrame("AA World Hotel Group");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -155,58 +165,115 @@ public class View {
     }
 
     // Getters for input fields and buttons
+
+    /**
+     * Gets the frame.
+     * @return the frame
+    */
     public JFrame getFrame() {
         return frame;
     }
 
+    /**
+     * Gets the hotel name field.
+     * @return the hotel name field
+     */
     public JTextField getHotelNameField() {
         return hotelNameField;
     }
 
+    /**
+     * Gets the hotel capacity field.
+     * @return the hotel capacity field
+     */
     public JTextField getHotelCapacityField() {
         return hotelCapacityField;
     }
 
+    /**
+     * Gets the hotel name dropdown for the View Hotel tab.
+     * @return the hotel name dropdown
+     */
     public JComboBox<String> getHotelNameDropdown() {
         return hotelNameDropdown;
     }
 
+    /**
+     * Gets the hotel name dropdown for the Manage Hotel tab.
+     * @return the hotel name dropdown
+     */
     public JComboBox<String> getHotelNameDropdown2() {
         return hotelNameDropdown2;
     }
 
+    /**
+     * Gets the hotel name dropdown for the Simulate Booking tab.
+     * @return the hotel name dropdown
+     */
     public JComboBox<String> getHotelNameDropdown3() {
         return hotelNameDropdown3;
     }
 
+    /**
+     * Gets the create hotel button.
+     * @return the create hotel button
+     */
     public JButton getCreateHotelButton() {
         return createHotelButton;
     }
 
+    /**
+     * Gets the low level information button.
+     * @return the low level information button
+     */
     public JButton getLowLevelInformationButton() {
         return lowLevelInformationButton;
     }
 
+    /**
+     * Gets the high level information button.
+     * @return the high level information button
+     */
     public JButton getHighLevelInformationButton() {
         return highLevelInformationButton;
     }
 
+    /**
+     * Gets the manage hotel button.
+     * @return the manage hotel button
+     */
     public JButton getManageHotelButton() {
         return manageHotelButton;
     }
 
+    /**
+     * Gets the simulate booking button.
+     * @return the simulate booking button
+     */
     public JButton getSimulateBookingButton() {
         return simulateBookingButton;
     }
 
+    /**
+     * Displays a message dialog.
+     * @param message - the message to be displayed
+     */
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(frame, message);
     }
 
+    /**
+     * Prompts the user for a new hotel name.
+     * @return the new hotel name entered by the user
+     */
     public String promptForNewHotelName() {
         return JOptionPane.showInputDialog(frame, "Enter new hotel name:");
     }
 
+    /**
+     * Prompts the user for a room number.
+     * @return the room number entered by the user, or -1 if the input is invalid
+     */
     public int promptForRoomName() {
         String roomNameStr = JOptionPane.showInputDialog(frame, "Enter room number:");
         try {
@@ -216,12 +283,20 @@ public class View {
         }
     }
 
+    /**
+     * Prompts the user to select a room type.
+     * @return the room type selected by the user, or null if no selection was made
+     */
     public String promptForRoomType() {
         String[] roomTypes = {"Standard", "Deluxe", "Executive"};
         int choice = JOptionPane.showOptionDialog(frame, "Select Room Type", "Room Type", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, roomTypes, roomTypes[0]);
         return (choice == -1) ? null : roomTypes[choice];
     }
 
+    /**
+     * Updates the hotel name dropdowns with the given list of hotel names.
+     * @param hotelNames - the list of hotel names to be added to the dropdowns
+     */
     public void updateHotelDropdowns(List<String> hotelNames) {
         hotelNameDropdown.removeAllItems();
         hotelNameDropdown2.removeAllItems();
