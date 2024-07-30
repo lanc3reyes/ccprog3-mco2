@@ -31,7 +31,7 @@ public class Reservation {
         this.checkOutDate = checkOutDate;
         this.room = room;
         setDiscountByString(discountString);
-        this.bill = calculateBill();
+        this.bill = calculateBill(guest);
         this.discount = null;
     }
 
@@ -102,9 +102,9 @@ public class Reservation {
      * 
      * @param discount - discount
      */
-    public void setDiscount(Discount discount) {
+    public void setDiscount(Discount discount, Guest guest) {
         this.discount = discount;
-        this.bill = calculateBill(); // Recalculate bill when discount is applied
+        this.bill = calculateBill(guest); // Recalculate bill when discount is applied
     }
 
     /**
@@ -112,7 +112,7 @@ public class Reservation {
      * 
      * @return total bill
      */
-    public double calculateBill() {
+    public double calculateBill(Guest guest) {
         double totalBill = 0.0;
 
         // Calculate the price without room type and discount
@@ -122,6 +122,14 @@ public class Reservation {
 
         // Apply room price modifier
         totalBill *= room.getRoomPriceModifier();
+
+        // Returning guest
+        System.out.println("test 1: " + guest.getReservationCount());
+        if (guest.getReservationCount() >= 2) {
+            double initialPrice = (double) (guest.getReservationCount() + 1) * 100;
+            System.out.println("test 2: " + guest.getReservationCount());
+            totalBill = totalBill - initialPrice;
+        }
 
         // Apply discount if any
         if (discount != null) {

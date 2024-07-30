@@ -17,6 +17,7 @@ public abstract class Room {
     private int floorNumber;
     private ArrayList<Reservation> reservationList;
     private HashMap<Integer, Double> datePriceModifiers;
+    private String bedType;
 
     /**
      * Constructor for the Room class.
@@ -31,6 +32,7 @@ public abstract class Room {
         this.datePriceModifiers = new HashMap<>();
         this.floorNumber = floorNumber;
         this.reservationList = new ArrayList<>();
+        this.bedType = "Twin Bed";
     }
 
     /**
@@ -166,4 +168,23 @@ public abstract class Room {
      * 
      */
     public abstract String getRoomType();
+
+    //BONUS FEATURE 
+    /**
+     * Gets the type of Bed
+     *
+     * @return bed type of that room
+     */
+    public String getBedType(){
+        return this.bedType;
+    }
+
+    /**
+     * Sets the type of Bed
+     *
+     * @param bedType - new bed type of the room
+     */
+    public void setBedType (String bedType){
+        this.bedType = bedType;
+    }
 }

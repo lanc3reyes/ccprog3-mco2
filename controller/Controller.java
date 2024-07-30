@@ -142,14 +142,20 @@ public class Controller {
 
             // Prints the reservations made by a specific guest.
             StringBuilder message = new StringBuilder("Reservations for " + guestName + ":\n");
+
+            double totalBill = 0;
             for (Reservation reservation : guestReservations) {
-                message.append("Guest Name: ").append(reservation.getGuest().getName())
-                       .append("\nRoom: ").append(reservation.getRoom().getRoomName())
+                
+                message.append("\nRoom: ").append(reservation.getRoom().getRoomName())
+                       .append("\nBed Type: ").append(reservation.getRoom().getBedType())
                        .append("\nCheck-In: ").append(reservation.getCheckInDate().getMonth()).append("/").append(reservation.getCheckInDate().getDay()).append("/").append(reservation.getCheckInDate().getYear())
                        .append("\nCheck-Out: ").append(reservation.getCheckOutDate().getMonth()).append("/").append(reservation.getCheckOutDate().getDay()).append("/").append(reservation.getCheckOutDate().getYear())
-                       .append("\nTotal Bill: ").append(reservation.getBill()).append("\n\n");
+                       .append("\nBill: ").append(reservation.getBill()).append("\n\n");
+
+                totalBill += reservation.getBill();
             }
-        
+            
+            message.append("Total Bill: " + totalBill);
             view.showMessage(message.toString());
         }
 
@@ -264,7 +270,7 @@ public class Controller {
                 return;
             }
             Hotel hotel = hotelList.get(location);
-            view.showMessage("Hotel Name: " + hotel.getName() + "\nNumber of Rooms: " + hotel.getRoomList().size());
+            view.showMessage("Hotel Name: " + hotel.getName() + "\nNumber of Rooms: " + hotel.getRoomList().size() + "\nTotal Earnings: " + hotel.calculateEarnings());
         }
     }
 
@@ -316,7 +322,7 @@ public class Controller {
                     StringBuilder message = new StringBuilder("Reservations for " + guestName + ":\n");
                     for (int i = 0; i < guestReservations.size(); i++) {
                         Reservation reservation = guestReservations.get(i);
-                        message.append("[").append(i + 1).append("] Room: ").append(reservation.getRoom().getRoomName())
+                        message.append("[").append(i + 1).append("] Room: ").append(reservation.getRoom().getRoomName()).append("\nBed Type: ").append(reservation.getRoom().getBedType())
                                .append("\n   Check-In: ").append(reservation.getCheckInDate().getMonth()).append("/").append(reservation.getCheckInDate().getDay()).append("/").append(reservation.getCheckInDate().getYear())
                                .append("\n   Check-Out: ").append(reservation.getCheckOutDate().getMonth()).append("/").append(reservation.getCheckOutDate().getDay()).append("/").append(reservation.getCheckOutDate().getYear())
                                .append("\n   Total Bill: ").append(reservation.getBill()).append("\n\n");
@@ -633,7 +639,7 @@ public class Controller {
             sortedRooms.sort(Comparator.comparingInt(Room::getRoomName));
 
             for (Room room : sortedRooms) {
-                roomListBuilder.append("Room ").append(room.getRoomName()).append(" ").append(room.getRoomType()).append("\n");
+                roomListBuilder.append("Room ").append(room.getRoomName()).append(", ").append(room.getRoomType()).append(", ").append(room.getBedType()).append("\n");
             }
             roomListArea.setText(roomListBuilder.toString());
     
@@ -662,11 +668,68 @@ public class Controller {
                             return;
                         }
 
-                        Guest guest = new Guest(guestName);
+                        String bedType = "Twin Bed";
+                        if (room.getRoomType().equals("Deluxe") || room.getRoomType().equals("Executive"))
+                        {
+                            JPanel bedTypePanel = new JPanel(new GridLayout(0, 1));
+                            JRadioButton twinBedButton = new JRadioButton("Twin Bed (Default)");
+                            JRadioButton singleBedButton = new JRadioButton("Single Bed");
+                            JRadioButton queenBedButton = new JRadioButton("Queen Bed");
+                            JRadioButton kingBedButton = new JRadioButton("King Bed");
+
+                            // Group the radio buttons to allow only one selection
+                            ButtonGroup group = new ButtonGroup();
+                            group.add(twinBedButton);
+                            group.add(singleBedButton);
+                            group.add(queenBedButton);
+                            group.add(kingBedButton);
+
+                            bedTypePanel.add(twinBedButton);
+                            bedTypePanel.add(singleBedButton);
+                            bedTypePanel.add(queenBedButton);
+                            bedTypePanel.add(kingBedButton);
+
+                            int resultBed = JOptionPane.showConfirmDialog(view.getFrame(), bedTypePanel, 
+                                "Select Bed Type", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                            if (resultBed == JOptionPane.OK_OPTION) {
+                                if (twinBedButton.isSelected()) {
+                                    // pass
+                                } else if (singleBedButton.isSelected()) {
+                                    bedType = "Single Bed";
+
+                                    room.setBedType(bedType);
+                                } else if (queenBedButton.isSelected()) {
+                                    bedType = "Queen Bed";
+                                    room.setBedType(bedType);
+                                } else if (kingBedButton.isSelected()) {
+                                    bedType = "King Bed";
+                                    room.setBedType(bedType);
+                                } else {
+                                    view.showMessage("Please select a bed type.");
+                                    return;
+                                }
+                            }
+                        }
+                        
+                        Guest guest = null;
+
+                        for (int k = 0; k < hotel.getReservationList().size(); k++) {
+                            if (guestName.equals(hotel.getReservationList().get(k).getGuest().getName())) {
+                                guest = hotel.getReservationList().get(k).getGuest();
+                            }
+                        }
+                        
+                        if (guest == null) {
+                            guest = new Guest(guestName);
+                        }
+
                         Date checkInDay = new Date(checkInDate);
                         Date checkOutDay = new Date(checkOutDate);
                         
                         Reservation reservation = new Reservation(guest, checkInDay, checkOutDay, room, discountString);
+
+                        guest.addReservation(reservation);
 
                         hotel.addReservation(reservation);
                         room.addReservation(reservation);
@@ -674,7 +737,14 @@ public class Controller {
                         String bookingMessage = "Booking successful!\nGuest: " + guestName +
                                 "\nRoom: " + roomNumber +
                                 "\nCheck-In: " + checkInDate +
-                                "\nCheck-Out: " + checkOutDate;
+                                "\nCheck-Out: " + checkOutDate +
+                                "\nBed Type: " + bedType;
+
+                        if (guest.getReservationCount() > 2) {
+                            bookingMessage = bookingMessage + "\nYou just won a Voucher! " + ((guest.getReservationCount() + 1) * 100)
+                                            + " has been deducted from your bill\nfor having " + guest.getReservationCount() + " reservations with us.\nThank you and enjoy your stay!";
+                        }
+                        //You just won a Voucher! (number of pesos deducted) has been deducted from your bill for having (number of reseravtions) reseravtions with us. Thank you and Enjoy your Stay!
 
                         view.showMessage(bookingMessage);
                     } catch (NumberFormatException ex) {
