@@ -231,6 +231,11 @@ public class Controller {
     
             int date = Integer.parseInt(dateString);
 
+            if (date < 1 || date > 31) {
+                view.showMessage("Invalid Day.");
+                return;
+            }
+
             // Creates an instance of date based on the integer variable.
             Date day = new Date(date);
             
